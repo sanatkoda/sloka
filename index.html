@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhakti-śāstrī ślokák</title>
+    
+    <meta name="theme-color" content="#d35400">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#d35400">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <style>
+        :root {
+            --primary-color: #e67e22;
+            --primary-dark: #d35400;
+            --bg-color: #fcf8f2;
+            --card-front-bg: #ffffff;
+            --card-back-bg: #fffbf5;
+            --text-color: #2c3e50;
+            --text-muted: #7f8c8d;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            color: var(--primary-dark);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .controls-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: 2px solid var(--primary-color);
+            background-color: white;
+            font-size: 16px;
+            color: var(--text-color);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .display-options {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 14px;
+        }
+
+        .display-options label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .first-line-option {
+            width: 100%;
+            text-align: center;
+            border-top: 1px dashed #eee;
+            padding-top: 8px;
+            margin-top: 5px;
+            justify-content: center !important;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+
+        .card-area {
+            width: 100%;
+            perspective: 1000px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .flashcard {
+            width: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            width: 100%;
+            min-height: 380px;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 1px solid rgba(230, 126, 34, 0.2);
+            box-shadow: var(--shadow);
+            background-color: var(--card-front-bg);
+        }
+
+        .card-front {
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-back {
+            background-color: var(--card-back-bg);
+            transform: rotateY(180deg);
+            border-left: 6px solid var(--primary-color);
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .flashcard.flipped .card-back {
+            position: relative;
+            height: auto;
+        }
+        .flashcard.flipped .card-front {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .verse-ref {
+            font-weight: bold;
+            color: var(--primary-dark);
+            font-size: 22px;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .verse-text {
+            font-style: italic;
+            font-size: 19px; 
+            font-weight: 600;
+            line-height: 1.6;
+            color: #2c3e50;
+            white-space: pre-line;
+            word-break: break-word;
+        }
+
+        .word-by-word {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 15px;
+            border-top: 1px dashed #bdc3c7;
+            padding-top: 12px;
+            width: 100%;
+        }
+
+        .translation-text {
+            font-size: 17px;
+            font-weight: 500;
+            line-height: 1.6;
+            color: #1a252f;
+        }
+
+        @media (min-width: 480px) {
+            .verse-text { font-size: 22px; }
+            .translation-text { font-size: 19px; }
+            .word-by-word { font-size: 15px; }
+            .card-face { padding: 40px 30px; min-height: 400px; }
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover { background-color: var(--primary-dark); }
+        .btn:active { transform: scale(0.98); }
+        .btn-secondary { background-color: #95a5a6; }
+
+        .footer-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .progress {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .hint {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Bhakti-śāstrī ślokák</h1>
+    </header>
+
+    <div class="app-container">
+        
+        <div class="controls-container">
+            <select id="categoryFilter" class="filter-select" onchange="filterCategory()">
+                <option value="all">Minden vers (Összesen)</option>
+                <option value="BG">Bhagavad-gítá</option>
+                <option value="BRS">Bhakti-rasāmṛta-sindhu</option>
+                <option value="ISO">Śrī Īśopaniṣad</option>
+                <option value="NOI">Nectar of Instruction</option>
+            </select>
+
+            <div class="display-options">
+                <label><input type="checkbox" id="showSanskrit" checked onchange="renderCard()"> Szanszkrit</label>
+                <label><input type="checkbox" id="showWbw" checked onchange="renderCard()"> Szóról-szóra</label>
+                <label><input type="checkbox" id="showTranslation" checked onchange="renderCard()"> Fordítás</label>
+                <label class="first-line-option">
+                    <input type="checkbox" id="onlyFirstLine" onchange="renderCard()"> Csak az első sor / 3 szó 📝
+                </label>
+            </div>
+        </div>
+
+        <div class="card-area" onclick="toggleFlip()">
+            <div id="flashcard" class="flashcard">
+                <div id="cardFront" class="card-face card-front">
+                    <div id="frontRef" class="verse-ref">...</div>
+                    <div id="frontText" class="verse-text">Betöltés...</div>
+                    <div class="hint" style="margin-top: auto; padding-top: 15px;">Kattints a kártyára a fordításhoz!</div>
+                </div>
+                <div id="cardBack" class="card-face card-back">
+                    <div id="backRef" class="verse-ref">...</div>
+                    <div id="backTranslation" class="translation-text">Betöltés...</div>
+                    <div id="backWbw" class="word-by-word"></div>
+                    <div class="hint" style="margin-top: auto; padding-top: 15px;">Kattints a visszafordításhoz!</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="btn btn-secondary" onclick="prevCard()">← Vissza</button>
+            <button class="btn" onclick="shuffleCards()">Keverés 🎲</button>
+            <button class="btn" onclick="nextCard()">Előre →</button>
+        </div>
+
+        <div class="footer-info">
+            <div id="progress" class="progress">0 / 0</div>
+        </div>
+
+    </div>
+
+    <script>
+        const slokaDatabase = [
+            { cat: "BG", ref: "BG 2.7", sanskrit: "kārpaṇya-doṣopahata-svabhāvaḥ\npṛcchāmi tvāṁ dharma-sammūḍha-cetāḥ\nyac chreyaḥ syān niścitaṁ brūhi tan me\nśiṣyas te ’haṁ śādhi māṁ tvāṁ prapannam", wbw: "kārpaṇya — fukarság; doṣa — gyengeségtől; upahata — sújtott; svabhāvaḥ — jellemzők; pṛcchāmi — kérdezlek; tvām — Téged; dharma — kötelesség tekintetében; sammūḍha — összezavarodott; cetāḥ — elme; yat — ami; śreyaḥ — legkedvezőbb; syāt — lehet; niścitalm — bizonyára; brūhi — mondd meg; tat — azt; me — nekem; śiṣyaḥ — tanítvány; te — a Te; aham — én vagyok; śādhi — oktass; mām — engem; tvām — Neked; prapannam — meghódolt.", trans: "Most zavarban vagyok a kötelességemet illetően, és szánalmas gyengeségem miatt elvesztettem önuralmamat. Ebben a helyzetben kérlek Téged, mondd meg világosan, mi a legjobb számomra! Most a tanítványod vagyok, egy lélek, aki meghódolt Előtted. Kérlek, oktass engem!" },
+            { cat: "BG", ref: "BG 2.13", sanskrit: "dehino ’smin yathā dehe\nkaumāraṁ yauvanaṁ jarā\ntathā dehāntara-prāptir\ndhīras tatra na muhyati", wbw: "dehinaḥ — a testesült léleké; asmin — ebben; yathā — amint; dehe — a testben; kaumāram — gyermekkor; yauvanam — fiatalság; jarā — öregség; tathā — hasonlóképpen; deha-antara — egy another test; prāptiḥ — elérése; dhīraḥ — a józan ember; tatra — ezen; na — nem; muhyati — zavorodik meg.", trans: "Amint a megtestesült lélek állandóan vándorol ebben a testben a gyermekkortól a serdülőkoron át az öregkorig, a halál pillanatában is egy másik testbe költözik. A józan embert azonban nem téveszti meg az efféle változás." },
+            { cat: "BG", ref: "BG 2.20", sanskrit: "na jāyate mriyate vā kadācin\nnāyaṁ bhūtvā bhavitā vā na bhūyaḥ\najo nityaḥ śāśvato ’yaṁ purāṇo\nna hanyate hanyamāne śarīre", wbw: "na — soha; jāyate — születik; mriyate — hal meg; vā — vagy; kadācit — bármikor; na — nem; ayam — ez; bhūtvā — keletkezve; bhavitā — létezni fog; vā — vagy; na — nem; bhūyaḥ — ismét; ajaḥ — születetlen; nityaḥ — örök; śāśvataḥ — állandó; ayam — ez; purāṇaḥ — legősibb; na — nem; hanyate — ölik meg; hanyamāne — amikor megölik; śarīre — a testet.", trans: "A lélek nem ismer sem születést, sem halált. Soha nem keletkezett, nem most jön létre, és a jövőben sem fog megszületni. Születetlen, örökkévaló, mindig létező és ősi, s ha a testet meg is ölik, ő akkor sem pusztul el." },
+            { cat: "BG", ref: "BG 2.44", sanskrit: "bhogaiśvarya-prasaktānāṁ\ntayāpahṛta-cetasām\nvyavasāyātmikā buddhiḥ\nsamādhau na vidhīyate", wbw: "bhoga — anyagi élvezet; aiśvarya — gazdagság; prasaktānām — akik ragaszkodnak; tayā — azáltal; apahṛta-cetasām — akiknek az elméjét megtévesztették; vyavasāya-ātmikā — a szilárd elhatározásban rögzült; buddhiḥ — értelem; samādhau — a Legfelsőbbön való rögzült meditációban; na — soha; vidhīyate — jön létre.", trans: "Azoknak az elméjében, akik túlságosan ragaszkodnak az érzéki élvezethez és az anyagi gazdagsághoz, s akiket mindezek megtévesztenek, sohasem ébred szilárd eltökéltség, hogy a Legfelsőbb Úr odaadó szolgálatát végezzék." },
+            { cat: "BG", ref: "BG 3.27", sanskrit: "prakṛteḥ kriyamāṇāni\nguṇaiḥ karmāṇi sarvaśaḥ\nahaṅkāra-vimūḍhātmā\nkartāham iti manyate", wbw: "prakṛteḥ — az anyagi természet; kriyamāṇāni — végrehajtott; guṇaiḥ — a kötőerők által; karmāṇi — tevékenységek; sarvaśaḥ — minden tekintetben; ahaṅkāra-vimūḍha — a hamis egótól összezavarodott; ātmā — lélek; kartā — a cselekvő; aham — én; iti — így; manyate — gondolja.", trans: "A hamis ego által megtévesztett lélek önmagát hiszi a tettek végrehajtójának, pedig valójában az anyagi természet három kötőereje végzi azokat." },
+            { cat: "BG", ref: "BG 4.2", sanskrit: "evaṁ paramparā-prāptam\nimaṁ rājarṣayo viduḥ\nsa kāleneha mahatā\nyogo naṣṭaḥ parantapa", wbw: "evam — így; paramparā — tanítványi láncolat útján; prāptam — kapott; imam — ezt; rāja-ṛṣayaḥ — a szent királyok; viduḥ — megértették; saḥ — az; kālena — az idő múlásával; iha — ebben a világban; mahatā — nagy; yogaḥ — a jóga tudománya; naṣṭaḥ — elveszett; param-tapa — ó, ellenség fegyelmezője (Arjuna).", trans: "E legfelsőbb tudomány ily módon, a tanítványi láncon keresztül szállt alá, s a szent királyok így értették meg azt. Idővel azonban megszakadt e lánc, ezért tűnik az eredeti tudomány elveszettnek." },
+            { cat: "BG", ref: "BG 4.7", sanskrit: "yadā yadā hi dharmasya\nglānir bhavati bhārata\nabhyutthānam adharmasya\ntadātmānaṁ sṛjāmy aham", wbw: "yadā yadā — amikor csak; hi — bizonyára; dharmasya — a vallásnak; glāniḥ — hanyatlása; bhavati — van; bhārata — ó, Bharata leszármazottja; abhyutthānam — felemelkedése; adharmasya — a vallástalanságnak; tadā — akkor; ātmānam — Magamat; sṛjāmi — manifesztálom; aham — én.", trans: "Ó, Bharata leszármazottja! Bárhol legyen a vallás gyakorlása hanyatlóban, s kerüljön fölényes túlsúlyba a vallástalanság, alászállok Én magam." },
+            { cat: "BG", ref: "BG 4.8", sanskrit: "paritrāṇāya sādhūnāṁ\nvīnāśāya ca duṣkṛtām\ndharma-saṁsthāpanārthāya\nsambhavāmi yuge yuge", wbw: "paritrāṇāya — a megszabadításért; sādhūnām — a jámboroké; vināśāya — a megsemmisítésért; ca — és; duṣkṛtām — a gonosztevőké; dharma — vallási elvek; saṁsthāpana-arthāya — szilárd megalapozásáért; sambhavāmi — megjelenek; yuge — korszakról; yuge — korszakra.", trans: "A jámborok felszabadítása, a gonoszok megsemmisítése, valamint a vallás elveinek visszaállítása végett korszakról korszakra megjelenek Én." },
+            { cat: "BG", ref: "BG 4.9", sanskrit: "janma karma ca me divyam\nevaṁ yo vetti tattvataḥ\ntyaktvā dehaṁ punar janma\nnaiti mām eti so ’rjuna", wbw: "janma — születésem; karma — tetteim; ca — és; me — az Enyém; divyam — transzcendentális; evam — így; yaḥ — aki; vetti — ismeri; tattvataḥ — a valóságban; tyaktvā — elhagyva; deham — a testet; punaḥ — ismét; janma — születést; na — nem; eiti — ér el; mām — Hozzám; eti — jön; saḥ — ő; arjuna — ó, Arjuna.", trans: "Ó, Arjuna! Aki ismeri megjelenésem és cselekedeteim transzcendentális természetét, az teste elhagyása után nem születik meg újra ebben az anyagi világban, hanem eléri az Én örök hajlékomat." },
+            { cat: "BG", ref: "BG 4.34", sanskrit: "tad viddhi praṇipātena\nparipraśnena sevayā\nupadekṣyanti te jñānaṁ\njñāninas tattva-darśinaḥ", wbw: "tat — ezt a tudást; viddhi — próbáld megérteni; praṇipātena — egy lelki tanítómester előtt való meghódolással; paripraśnena — alázatos tudakozódással; sevayā — szolgálat által; upadekṣyanti — beavatnak; te — téged; jñānam — a tudásba; jñāninaḥ — az önmegvalósítottak; tattva — az igazságot; darśinaḥ — akik látták.", trans: "Fordulj egy lelki tanítómesterhez, úgy próbáld megismerni az igazságot! Tudakozódj tőle alázatosan, és szolgáld őt! Az önmegvalósított lelkek képesek tudásban részesíteni téged, mert ők már látták az igazságot." },
+            { cat: "BG", ref: "BG 5.22", sanskrit: "ye hi saṁsparśajā bhogā\nduḥkha-yonaya eva te\nādy-antavantaḥ kaunteya\nna teṣu ramate budhaḥ", wbw: "ye — amelyek; hi — bizonyára; saṁsparśa-jāḥ — az anyagi érzékek érintkezéséből származó; bhogāḥ — élvezetek; duḥkha — szenvedés; yonayaḥ — forrásai; eva — bizonyára; te — azok; ādi — kezdet; anta — és vég; vantaḥ — birtokolva; kaunteya — ó, Kuntī fia; na — nem; teṣu — azokban; ramate — leli örömét; budhaḥ — az értelmes ember.", trans: " Az okos távol tartja magát a szenvedés forrásaitól, amelyek az anyagi érzékekkel való kapcsolatból származnak. Ó, Kuntī fia, az efféle élvezeteknek kezdetük és végük van, ezért a bölcs nem leli bennük örömét." },
+            { cat: "BG", ref: "BG 5.29", sanskrit: "bhoktāraṁ yajna-tapasāṁ\nsarva-loka-maheśvaram\nsuhṛdaṁ sarva-bhūtānāṁ\njñātvā māṁ śāntim ṛcchati", wbw: "bhoktāram — a végső élvezőt; yajña — az áldozatok; tapasām — és lemondások; sarva-loka — minden bolygó; mahā-īśvaram — Legfelsőbb Urát; suhṛdam — a jótevőt; sarva — minden; bhūtānām — élőlényé; jñātvā — megismerve; mām — Engem; śāntim — békét; ṛcchati — elér.", trans: "Akinek tudata Bennem merül el, s tudja, hogy Én vagyok minden áldozat és önfegyelmezés végső haszonélvezője, minden bolygó és félisten Legfelsőbb Ura, valamint az összes élőlény jóakarója és jótevője, az megszabadul az anyagi szenvedésektől, és eléri a békét." },
+            { cat: "BG", ref: "BG 6.47", sanskrit: "yoginām api sarveṣāṁ\nmad-gatenāntar-ātmanā\nśraddhāvān bhajate yo māṁ\nsa me yuktatamo mataḥ", wbw: "yoginām — a jógik; api — is; sarveṣām — mind közül; mat-gatena — Bennem lakozva; antaḥ-ātmanā — magában; śraddhā-vān — hittel teli szívvel; bhajate — transzcendentális szeretet-szolgálatot végez; yaḥ — aki; mām — Nekem; saḥ — ő; me — általam; yukta-tamaḥ — a legszorosabban kapcsolódó; mataḥ — tartott.", trans: "Aki nagy hittel mindig Bennem lakozik, magában Énrám gondol, s transzcendentális szerető szolgálatot végez Nekem, az a legmeghittebben egyesül Velem a yogában, s minden yogī közül ő a legkiválóbb. Ez az Én véleményem." },
+            { cat: "BG", ref: "BG 7.5", sanskrit: "apareyam itas tv anyāṁ\nprakṛtiṁ viddhi me parām\njīva-bhūtāṁ mahā-bāho\nyayedaṁ dhāryate jagat", wbw: "aparā — alacsonyabb rendű; iyam — ez; itaḥ — ezen kívül; tu — de; anyām — egy másik; prakṛtim — energiát; viddhi — ismerd meg; me — az Enyémet; parām — felsőbb rendű; jīva-bhūtām — az élőlényekből állót; mahā-bāho — ó, erős karú; yayā — ami által; idam — ez; dhāryate — fenn van tartva; jagat — az anyagi világ.", trans: "Ó, erős karú Arjuna, ezeken kívül van egy másik, felsőbbrendű energiám is: az élőlények, akik kihasználják az anyagi, alsóbbrendű természet forrásait." },
+            { cat: "BG", ref: "BG 7.14", sanskrit: "daivī hy eṣā guṇamayī\nmama māyā duratyayā\nmām eva ye prapadyante\nmāyām etāṁ taranti te", wbw: "daivī — transzcendentális; hi — bizonyára; eṣā — ez; guṇa-mayī — az anyagi természet három kötőerejéből álló; mama — az Enyém; māyā — energia; duratyayā — nagyon nehéz legyőzni; mām — Nekem; eva — egyedül; ye — akik; prapadyante — átadják magukat; māyām — energián; etām — ezen; taranti — átlépnek; te — ők.", trans: "Az anyagi természet három kötőerejéből álló isteni energiámat nagyon nehéz legyőzni. De akik átadták magukat Nekem, azok könnyen túllépnek rajta." },
+            { cat: "BG", ref: "BG 7.19", sanskrit: "bahūnāṁ janmanām ante\njñānavān māṁ prapadyate\nvāsudevaḥ sarvam iti\nsa mahātmā sudurlabhaḥ", wbw: "bahūnām — sok; janmanām — születések; ante — végén; jñāna-vān — a valódi tudással rendelkező ember; mām — Nekem; prapadyate — átadja magát; vāsudevaḥ — Kṛṣṇa Úr; sarvam — minden; iti — így; saḥ — az az; mahā-ātmā — nagy lélek; su-durlabhaḥ — rendkívül ritka.", trans: "Sok-sok születés és halál után az igazi tudást elsajátító ember átadja magát Nekem, mert tudja, hogy Én vagyok minden ok oka, és Rajtam kívül nem létezik semmi. Az ilyen nagy lélek bizony ritka." },
+            { cat: "BG", ref: "BG 8.5", sanskrit: "anta-kāle ca mām eva\nsmaran muktvā kalevaram\nyaḥ prayāti sa mad-bhāvaṁ\nyāti nāsty atra saṁśayaḥ", wbw: "anta-kāle — az élet végén; ca — is; mām — Rám; eva — egyedül; smaran — emlékezve; muktvā — elhagyva; kalevaram — a testet; yaḥ — aki; prayāti — eltávozik; saḥ — ő; mad-bhāvam — az Én természetemet; yāti — eléri; na — nincs; asti — van; atra — itt; saṁśayaḥ — kétség.", trans: "Bárki legyen is az, ha élete végén egyedül Rám emlékezve hagyja el testét, minden kétséget kizárva azonnal eléri az Én természetemet." },
+            { cat: "BG", ref: "BG 8.16", sanskrit: "ā-brahma-bhuvanāl lokāḥ\npunav āvartino ’rjuna\nmām upetya tu kaunteya\nkuna-janma na vidhīyate", wbw: "ā-brahma-bhuvanāt — a legfelsőbb bolygótól; lokāḥ — a bolygórendszerek; punaḥ — ismét; āvartinaḥ — visszatérők; arjuna — ó, Arjuna; mām — Hozzám; upetya — megérkezve; tu — de; kaunteya — ó, Kuntī fia; punaḥ janma — újraszületés; na — nem; vidhīyate — történik.", trans: "Az anyagi világ a legfelső bolygótól a legalsóig a szenvedés birodalma, ahol az ismétlődő születés és halál az úr. Aki azonban, ó, Kuntī fia, eljut az Én hajlékomra, az sohasem születik meg újra!" },
+            { cat: "BG", ref: "BG 9.2", sanskrit: "rāja-vidyā rāja-guhyaṁ\npavitram idam uttamam\npratyakṣāvagamaṁ dharmyaṁ\nsusukhaṁ kartum avyayam", wbw: "rāja-vidyā — a tudás királya; rāja-guhyam — a legtitkosabb titok; pavitram — a legtisztább; idam — ez; uttamam — transzcendentális; pratyakṣa — közvetlen tapasztalás útján; avagamam — megértett; dharmyam — a vallás elve; su-sukham — nagyon boldogan; kartum — végrehajtani; avyayam — örökkévaló.", trans: "Ez a tudás a bölcsesség királya, a legnagyobb titok az összes titok közül. Ez a legtisztább tudás, és mivel megvalósítása révén közvetlen tapasztalatot nyújt az önvalóról, ez a vallás tökéletessége; örökkévaló és örömmel végezhető." },
+            { cat: "BG", ref: "BG 9.4", sanskrit: "mayā tatam idaṁ sarvaṁ\njagad avyakta-mūrtinā\nmat-sthāni sarva-bhūtāni\nna cāhaṁ teṣv avasthithaḥ", wbw: "mayā — Általam; tatam — át van hatva; idam — ez; sarvam — az egész; jagat — univerzum; avyakta-mūrtinā — nem nyilvánult formámban; mat-sthāni — Bennem van; sarva-bhūtāni — minden élőlény; na — nem; ca — és; aham — Én; teṣu — bennük; avasthitaḥ — lakozom.", trans: "Megnyilvánulatlan formámban ezt az egész univerzumot áthatom. Minden lény Bennem van, de Én nem vagyok bennük." },
+            { cat: "BG", ref: "BG 9.14", sanskrit: "satataṁ kīrtayanto māṁ\nyatantaś ca dṛḍha-vratāḥ\nnamasyantaś ca māṁ bhaktyā\nnitya-yuktā upāsate", wbw: "satatam — állandóan; kīrtayantaḥ — dicsőítve; mām — Engem; yatantaḥ — nagy elszántsággal törekedve; ca — és; dṛḍha-vratāḥ — szilárd fogadalommal; namasyantaḥ — leborulva; ca — és; mām — Előttem; bhaktyā — áhítattal; nitya-yuktāḥ — örökké elmerülve; upāsate — imádnak.", trans: "Ezek a nagy lelkek állandóan az Én dicsőségemet zengik, nagy elszántsággal igyekeznek, s leborulva Előttem szüntelenül odaadóan imádnak Engem." },
+            { cat: "BG", ref: "BG 9.25", sanskrit: "yānti deva-vratā devān\npitṝn yānti pitṛ-vratāḥ\nbhūtāni yānti bhūtejyā\nyānti mad-yājino ’pi mām", wbw: "yānti — mennek; deva-vratāḥ — a félistenek imádói; devān — a félistenekhez; pitṝn — az ősökhöz; yānti — mennek; pitṛ-vratāḥ — az ősök imádói; bhūtāni — a szellemekhez; yānti — mennek; bhūta-ijyāḥ — a szellemek imádói; yānti — mennek; mat — az Én; yājinaḥ — imádóim; api — is; mām — Hozzám.", trans: "A félisteneket imádók a félistenek között fognak újraszületni, az ősatyák imádói az ősatyákhoz jutnak; akik a szellemeket és kísérteteket imádják, azok közéjük születnek, s akik Engem imádnak, azok Velem fognak élni." },
+            { cat: "BG", ref: "BG 9.26", sanskrit: "patraṁ puṣpaṁ phalaṁ toyaṁ\nyo me bhaktyā prayacchati\ntad ahaṁ bhakty-upahṛtam\naśnāmi prayatātmanaḥ", wbw: "patram — levelet; puṣpam — virágot; phalam — gyümölcsöt; toyam — vizet; yaḥ — aki; me — Nekem; bhaktyā — áhítattal; prayacchati — felajánl; tat — azt; aham — Én; bhakti-upahṛtam — szeretetből felajánlottat; aśnāmi — elfogadom; prayata-ātmanaḥ — a tiszta tudatú embertől.", trans: "Ha valaki szeretettel és odaadással áldoz Nekem egy levelet, egy virágot, egy gyümölcsöt vagy egy kevés vizet, Én elfogadom azt." },
+            { cat: "BG", ref: "BG 9.27", sanskrit: "yat karoṣi yad aśnasi\nyaj juhoṣi dadāsi yat\nyat tapasyasi kaunteya\ntat kuruṣva mad-arpaṇam", wbw: "yat — bármit; karoṣi — teszel; yat — bármit; aśnāsi — eszel; yat — bármit; juhoṣi — felajánlasz; dadāsi — adsz ajándékba; yat — bármit; yat — bármit; tapasyasi — lemondást végzel; kaunteya — ó, Kuntī fia; tat — azt; kuruṣva — tedd; mad — Nekem; arpaṇam — felajánlásként.", trans: "Ó, Kuntī fia, ajánld fel Nekem mindazt, amit cselekszel, eszel, felajánlasz vagy elajándékozol, valamennyi lemondásoddal együtt!" },
+            { cat: "BG", ref: "BG 9.29", sanskrit: "samo ’haṁ sarva-bhūteṣu\nna me dveṣyo ’sti na priyaḥ\nye bhajanti tu māṁ bhaktyā\nmayi te teṣu cāpy aham", wbw: "samaḥ — egyforma; aham — Én vagyok; sarva-bhūteṣu — minden élőlényhez; na — nem; me — Nekem; dveṣyaḥ — gyűlölt; asti — van; na — nem; priyaḥ — kedves; ye — akik; bhajanti — odaadó szolgálat-szolgálatot végeznek; tu — de; mām — Nekem; bhaktyā — áhítattal; mayi — Bennem; te — ők; teṣu — bennük; ca — is; api — bizonyára; aham — Én.", trans: "Én senkire sem irigykedem, és olyan sincs, akivel szemben elfogult lennék – mindenkivel egyenlően bánok. De aki odaadással szolgál Engem, az a barátom, Bennem van, s Én is a barátja vagyok." },
+            { cat: "BG", ref: "BG 10.8", sanskrit: "ahaṁ sarvasya prabhavo\nmattaḥ sarvaṁ pravartate\niti matvā bhajante māṁ\nbudhā bhāva-samanvitāḥ", wbw: "aham — Én vagyok; sarvasya — mindenek; prabhavaḥ — a forrása; mattaḥ — Tőlem; sarvam — minden; pravartate — árad; iti — így; matvā — gondolva; bhajante — imádnak; mām — Engem; budhāḥ — a bölcsek; bhāva-samanvitāḥ — eksztatikus áhítattal.", trans: " Én vagyok az eredete a lelki és az anyagi világnak, minden Belőlem árad. A bölcsek, akik tudva tudják ezt, odaadóan szolgálnak és teljes szívből imádnak Engem." },
+            { cat: "BG", ref: "BG 10.10", sanskrit: "teṣāṁ satata-yuktānāṁ\nbhajatāṁ prīti-pūrvakam\ndadāmi buddhi-yogaṁ taṁ\nyena mām upayānti te", wbw: "teṣām — nekik; satata-yuktānām — akik mindig elmerülnek; bhajatām — az odaadó szolgálatban; prīti-pūrvakam — szeretettel; dadāmi — adom; buddhi-yogam — a transzcendentális értelmet; tam — azt; yena — ami által; mām — Hozzám; upayānti — eljutnak; te — ők.", trans: "Akik szüntelen odaadással és szeretettel szolgálnak Engem, azoknak megadom azt az értelmet, amellyel eljuthatnak Hozzám." },
+            { cat: "BG", ref: "BG 13.22", sanskrit: "puruṣaḥ prakṛti-stho hi\nbhuṅkte prakṛtijān guṇān\nkāraṇaṁ guṇa-saṅgo ’sya\nsad-asad-yoni-janmasu", wbw: "puruṣaḥ — az élőlény; prakṛti-sthaḥ — az anyagi természetben lévő; hi — bizonyára; bhuṅkte — élvezi; prakṛti-jān — az anyagi természetből származó; guṇān — kötőerőket; kāraṇam — az ok; guṇa-saṅgah — a kötőerőkkel való társulás; asya — az élőlényé; sat-asat — a jó és rossz; yoni — fajok közötti; janmasu — születésekben.", trans: "Így él az élőlény az anyagi természetben, a természet három kötőerejét élvezve, s mindez az anyagi természettel való kapcsolatának köszönhető. Ily módon hol jó, hol pedig rossz éri őt a különféle fajokban." },
+            { cat: "BG", ref: "BG 13.23", sanskrit: "upadraṣṭānumantā ca\nbhartā bhoktā maheśvaraḥ\nparamātmeti cāpy ukto\ndehe ’smin puruṣaḥ paraḥ", wbw: "upadraṣṭā — a felügyelő; anumantā — a megengedő; ca — és; bhartā — a fenntartó; bhoktā — a legfőbb élvező; mahā-īśvaraḥ — a Legfelsőbb Úr; paramātmā — a Felsőbbelélek; iti — így; ca — is; api — is; uktaḥ — mondják; dehe — a testben; asmin — ebben; puruṣaḥ — a transzcendentális élvező; paraḥ — legfelsőbb.", trans: "Ebben a testben van egy másik, egy transzcendentális élvező is – az Úr, a legfelsőbb birtokos, aki felülvigyázóként és engedélyezőként létezik, s akit Felsőléleknek neveznek." },
+            { cat: "BG", ref: "BG 14.26", sanskrit: "māṁ ca yo ’vyabhicāreṇa\nbhakti-yogena sevate\nsa guṇān samatītyaitān\nbrahma-bhūyāya kalpate", wbw: "mām — Nekem; ca — is; yaḥ — aki; avyabhicāreṇa — csalhatatlan; bhakti-yogena — odaadó szolgálattal; sevate — szolgálatot végez; saḥ — ő; guṇān — a kötőerőket; samatītya — meghaladva; etān — ezeket; brahma-bhūyāya — a Brahman szintjére; kalpate — felemelkedik.", trans: "Aki a teljes odaadó szolgálatba merül, s nem esik vissza semmilyen körülmények között, az egyszeriben túllép az anyagi természet kötőerőin, s így a Brahman síkjára emelkedik." },
+            { cat: "BG", ref: "BG 15.7", sanskrit: "mamaivāṁśo jīva-loke\njīva-bhūtaḥ sanātanaḥ\nmanaḥ-ṣaṣṭhānīndriyāṇi\nprakṛti-sthāni karṣati", wbw: "mama — az Ényém; eva — bizonyára; aṁśaḥ — elkülönült rész; jīva-loke — az anyagi világban; jīva-bhūtaḥ — a testesült élőlény; sanātanaḥ — örök; manaḥ — az elme; ṣaṣṭhāni — a hatodikkal; indriyāṇi — az érzékekkel; prakṛti — az anyagi természetben; sthāni — lévőkkel; karṣati — küzd.", trans: "Az élőlények ebben a feltételekhez kötött világban az Én örökkévaló, parányi részeim. Feltételekhez kötött létük miatt küzdelmes harcot vívnak a hat érzékszervvel, melyhez az elme is hozzátartozik." },
+            { cat: "BG", ref: "BG 15.15", sanskrit: "sarvasya cāhaṁ hṛdi sanniviṣṭo\nmattaḥ smṛtir jñānam apohanaṁ ca\nvedaiś ca sarvair aham eva vedyo\nvedānta-kṛd veda-vid eva cāham", wbw: "sarvasya — minden élőlénynek; ca — és; aham — Én; hṛdi — a szívében; sanniviṣṭaḥ — ott lakozom; mattaḥ — Tőlem; smṛtiḥ — az emlékezet; jñānam — a tudás; apohanam — és a felejtés; ca — és; vedaiḥ — a Védák által; ca — és; sarvaiḥ — az összes; aham — Én; eva — bizonyára; vedyo — megismerendő; vedānta-kṛt — a Vedānta szerzője; veda-vid — a Védák ismerője; eva — bizonyára; ca — és; aham — Én.", trans: "Én mindenki szívében ott lakozom, s Tőlem jön az emlékezet, a tudás és a feledékenység. Én vagyok az, akit a Védákból meg kell ismerni, s Én vagyok a Vedānta szerkesztője és a Védák ismerője is." },
+            { cat: "BG", ref: "BG 18.54", sanskrit: "brahma-bhūtaḥ prasannātmā\nna śocati na kāṅkṣati\nsamaḥ sarveṣu bhūteṣu\nmad-bhaktiṁ labhate parām", wbw: "brahma-bhūtaḥ — a transzcendentális szinten lévő; prasanna-ātmā — teljesen boldog lélek; na — nem; śocati — kesereg; na — nem; kāṅkṣati — vágyik; samaḥ — egyforma; sarveṣu — minden; bhūteṣu — élőlénnyel szemben; mad-bhaktim — az Én odaadó szolgálatomat; labhate — eléri; parām — a tiszta szinten.", trans: "Aki ekképpen eljutott a transzcendentális síkra, az egyszerre tudatára ébred a Legfelsőbb Brahmannak, és teljes boldogság tölti el. Sohasem bánkódik, nem vágyik semmire, és egyformán viszonyul minden élőlényhez. Ebben az állapotban tiszta odaadó szolgálatot végezhet Nekem." },
+            { cat: "BG", ref: "BG 18.55", sanskrit: "bhaktyā mām abhijānāti\nyāvān yaś cāsmi tattvataḥ\ntato māṁ tattvato jñātvā\nviśate tad-anantaram", wbw: "bhaktyā — odaadó szolgálat által; mām — Engem; abhijānāti — megismerhet; yāvān — amilyen nagy; yaḥ ca asmi — ami vagyok; tattvataḥ — a valóságban; tataḥ — ezután; mām — Engem; tattvataḥ — a valóságban; jñātvā — megismerve; viśate — beléphet; tat-anantaram — azután.", trans: "Engem, az Istenség Legfelsőbb Személyiségét egyedül az odaadó szolgálat által lehet igazán megérteni. Ha valaki az ilyen odaadás révén tudatát teljesen Bennem merítette el, beléphet Isten birodalmába." },
+            { cat: "BG", ref: "BG 18.65", sanskrit: "man-manā bhava mad-bhakto\nmad-yājī māṁ namaskuru\nmām evaiṣyasi satyaṁ te\npratijāne priyo ’si me", wbw: "mat-manāḥ — gondolj mindig Rám; bhava — válj; mad-bhaktaḥ — az Én hívőmmé; mad-yājī — az Én imádómmá; mām — Előttem; namaskuru — borulj le; mām — Hozzám; eva — bizonyára; eṣyasi — eljössz; satyam — igazán; te — neked; pratijāne — megígérem; priyah — kedves barátom; asi — vagy; me — Nekem.", trans: "Gondolj mindig Rám, légy az Én hívem! Imádj Engem, és ajánld tiszteletedet Előttem, s így kétségtelenül el fogsz jutni Hozzám! Ezt megígérem neked, mert nagyon kedves barátom vagy." },
+            { cat: "BG", ref: "BG 18.66", sanskrit: "sarva-dharmān parityajya\nmām ekaṁ śaraṇaṁ vraja\nahaṁ tvāṁ sarva-pāpebhyo\nmokṣayiṣyāmi mā śucaḥ", wbw: "sarva-dharmān — a vallás minden formáját; parityajya — elhagyva; mām — Nekem; ekam — egyedül; śaraṇam — menedéket; vraja — vedd; aham — Én; tvām — téged; sarva — minden; pāpebhyaḥ — bűnös visszahatástól; mokṣayiṣyāmi — megszabadítalak; mā — ne; śucaḥ — aggódj.", trans: "Hagyj fel a vallás minden változatával, s hódolj meg egyedül Énelőttem! Én megszabadítalak minden bűnös visszahatástól, ne félj!" },
+            { cat: "BRS", ref: "BRS 1.1.11", sanskrit: "anyābhilāṣitā-śūnyaṁ\njñāna-karmādy-anāvṛtam\nānukūlyena kṛṣṇānu-\nśīlanaṁ bhaktir uttamā", wbw: "anya-abhilāṣitā-śūnyam — mentes minden más vágytól; jñāna — a filozofikus spekulációtól; karma — a gyümölcsöző tettektől; ādi — és egyebektől; anāvṛtam — nem eltakart...", trans: "Amikor az első osztályú odaadó szolgálat fejlődik, az mentes minden más vágytól, a filozofikus spekulációtól és a gyümölcsöző cselekedetektől. Ebben az állapotban a bhakta kedvező módon, tisztán Kṛṣṇa elégedettségére cselekszik." },
+            { cat: "BRS", ref: "BRS 1.1.12", sanskrit: "sarvopādhi-vinirmuktaṁ\ntat-paratvena nirmalam\nhṛṣīkeṇa hṛṣīkeśa-\nsevanaṁ bhaktir ucyate", wbw: "sarva-upādhi — minden anyagi megjelöléstől; vinirmuktam — teljesen megszabadult; tat-paratvena — Kṛṣṇához kapcsolódva; nirmalam — tiszta...", trans: "Odaadó szolgálatnak (bhakti) nevezik azt, amikor valaki az összes érzékét a minden érzék Urának (Hṛṣīkeśa) szolgálatára használja, mentesen minden anyagi megjelöléstől, tisztán Kṛṣṇához kapcsolódva." },
+            { cat: "BRS", ref: "BRS 1.2.234", sanskrit: "ataḥ śrī-kṛṣ-nāmādi\nna bhaved grāhyam indriyaiḥ\nsevonmukhe hi jihvādau\nsvayam eva sphuraty adaḥ", wbw: "ataḥ — ezért; śrī-kṛṣṇa-nāma-ādi — Kṛṣṇa szent neve, formája, tulajdonságai; na bhavet — nem lehetséges; grāhyam — fogni; indriyaiḥ — az anyagi érzékekkel...", trans: "Az anyagi érzékekkel nem lehet megérteni Śrī Kṛṣṇa nevét, formáját, tulajdonságait és kedvteléseit. Csak akkor nyilvánul meg önmagától, ha az élőlény a nyelvével kezdődően (a szent név vibrálásával és prasādam elfogadásával) hódolatteljes szolgálatba kezd." },
+            { cat: "BRS", ref: "BRS 1.2.255", sanskrit: "anāsaktasya viṣayān\nyathārham upayuñjataḥ\nnirbandhaḥ kṛṣṇa-sambandhe\nyuktaṁ vairāgyam ucyate", wbw: "anāsaktasya — a ragaszkodásmentes embernek; viṣayān — az érzéktárgyakat; yathā-arham — megfelelően; upayuñjataḥ — elfogadva; nirbandhaḥ — rögzültség...", trans: "Amikor valaki nem ragaszkodik az anyagi érzékkielégítéshez, de mindent elfogad Kṛṣṇával kapcsolatban, azt nevezik yukta-vairāgyának, vagyis valódi lemondásnak." },
+            { cat: "ISO", ref: "ISO Invocation", sanskrit: "oṁ pūrṇam adaḥ pūrṇam idaṁ\npūrṇāt pūrṇam udacyate\npūrṇasya pūrṇam ādāya\npūrṇam evāvaśiṣyate", wbw: "oṁ — a Legfelsőbb Úr; pūrṇam — teljesen tökiemletes; adaḥ — az a transzcendentális világ; pūrṇam — teljesen tökéletes; idam — ez a megnyilvánult világ...", trans: "A Legfelsőbb Úr, az Istenség Személyisége teljesen tökéletes, s mivel Ő teljesen tökéletes, minden belőle áradó megnyilvánulás – mint ez a jelenségvilág – szintén teljesen fel van szerelve mindennel, mint teljes egész. Bármi árad a Teljes Egészből, az maga is önmagában teljes. Mivel Ő a Teljes Egész, bár oly sok teljes rész árad Belőle, Ő mégis teljes egész marad." },
+            { cat: "ISO", ref: "ISO Mantra 1", sanskrit: "īśāvāsyam idam sarvaṁ\nyat kiñca jagatyāṁ jagat\ntena tyaktena bhuñjīthā\nmā gṛdhaḥ kasya svid dhanam", wbw: "īśa — az Úr által; āvāsyam — ellenőrzött és birtokolt; idam — ez; sarvam — minden... tena — ezáltal; tyaktena — a kijelölt résszel; bhuñjīthāḥ — fogadd el a szükségleteidet...", trans: "Az Úr birtokol és irányít mindent, legyen az élő vagy élettelen, ami az univerzumban létezik. Az embernek ezért csak azt szabad elfogadnia, ami szükséges, s amit a sors neki rendelt, s jól kell tudnia, hogy minden egyéb kihez tartozik." },
+            { cat: "NOI", ref: "NOI Vers 1", sanskrit: "vāco vegaṁ manasaḥ krodha-vegaṁ\njihvā-vegam udaropastha-vegam\netān vegān yo viṣaheta dhīraḥ\nsarvām apīmāṁ pṛthivīṁ sa śiṣyāt", wbw: "vācaḥ vegam — a beszéd késztetését; manasaḥ — az elme; krodha-vegam — a harag késztetését; jihvā-vegam — a nyelv késztetését...", trans: "Az a józan ember (dhīra), aki képes elviselni a beszéd késztetését, az elme követelőzését, a harag kitöréseit, valamint a nyelv, a gyomor és a nemi szervek ösztönzését, alkalmas arra, hogy tanítványokat fogadjon el az egész világon." },
+            { cat: "NOI", ref: "NOI Vers 2", sanskrit: "atyāhāraḥ prayāsaś ca\nprajalpo niyāmagrahaḥ\njana-saṅgaś ca laulyaṁ ca\nṣaḍbhir bhaktir vinaśyati", wbw: "ati-āhāraḥ — a túl sok evés vagy gyűjtögetés; prayāsaḥ — a túl nehéz anyagi törekvés; prajalpaḥ — a felesleges beszéd...", trans: "Az odaadó szolgálat elvész, ha a bhakta a következő hat hibába esik: (1) túl sokat eszik vagy a szükségesnél több pénzt, anyagi javat gyűjt; (2) túlságosan megerőlteti magát olyan anyagi dolgokért, amelyeket nehéz elérni; (3) feleslegesen beszél világi témákról; (4) mereven követi a szabályokat anélkül, hogy értené a céljukat, vagy elveti a szentírások szabályait; (5) világi gondolkodású emberekkel társul; (6) mohón vágyik világi eredményekre." },
+            { cat: "NOI", ref: "NOI Vers 3", sanskrit: "utsāhān niścayād dhairyāt\ntat-tat-karma-pravartanāt\nsaṅga-tyāgāt sato vṛtteḥ\nṣaḍbhir bhaktiḥ prasidhyati", wbw: "utsāhāt — lelkesedéstől; niścayād — bizalomtól és elszántságtól; dhairyāt — türelemtől...", trans: "Hat alapelv biztosítja az odaadó szolgálat sikerét: (1) lelkesedés, (2) elszántság és bizalom, (3) türelem, (4) a szabályozó elvek szerinti cselekvés (mint a hallás, éneklés és Kṛṣnára emlékezés), (5) a nem-hívők társaságának feladása, és (6) az előző ācāryák (szent tanítók) lábnyomainak követése." },
+            { cat: "NOI", ref: "NOI Vers 4", sanskrit: "dadāti pratigṛhṇāti\nguhyam ākhyāti pṛcchati\nbhuṅkte bhojayate caiva\nṣaḍ-vidhaṁ prīti-lakṣaṇam", wbw: "dadāti — ajándékot ad; pratigṛhṇāti — ajándékot elfogad; guhyam — bizalmas dolgokat; ākhyāti — kinyilatkoztat...", trans: "Ajándékot adni és ajándékot elfogadni, bizalmasan beszélni és kérdezni, étellel kínálni és elfogadni a felkínált ételt – ez az a hatos fogat, amely a hívők közötti tiszta szeretetet jellemzi." }
+        ];
+
+        let currentList = [...slokaDatabase];
+        let currentIndex = 0;
+        let isFlipped = false;
+
+        function filterCategory() {
+            const filterValue = document.getElementById("categoryFilter").value;
+            currentList = filterValue === "all" ? [...slokaDatabase] : slokaDatabase.filter(s => s.cat === filterValue);
+            currentIndex = 0;
+            resetFlip();
+            renderCard();
+        }
+
+        function renderCard() {
+            if (currentList.length === 0) {
+                updateUI("Nincs találat", "Ebben a kategóriában nincsenek versek.", "-", "", "", "0 / 0");
+                return;
+            }
+
+            const currentSloka = currentList[currentIndex];
+            const options = {
+                sanskrit: document.getElementById("showSanskrit").checked,
+                wbw: document.getElementById("showWbw").checked,
+                trans: document.getElementById("showTranslation").checked,
+                onlyFirst: document.getElementById("onlyFirstLine").checked
+            };
+
+            let sanskritDisplay = options.onlyFirst 
+                ? currentSloka.sanskrit.split('\n')[0] + "\n..." 
+                : (options.sanskrit ? currentSloka.sanskrit : "[Szanszkrit elrejtve]");
+
+            let translationDisplay = "";
+            if (options.onlyFirst) {
+                const words = currentSloka.trans.trim().split(/\s+/);
+                translationDisplay = words.slice(0, 3).join(' ') + " ...";
+            } else {
+                translationDisplay = options.trans ? currentSloka.trans : "[Fordítás elrejtve]";
+            }
+
+            updateUI(
+                currentSloka.ref, 
+                sanskritDisplay, 
+                currentSloka.ref + " - Fordítás", 
+                translationDisplay, 
+                (options.wbw && currentSloka.wbw) ? currentSloka.wbw : "",
+                `${currentIndex + 1} / ${currentList.length}`
+            );
+        }
+
+        function updateUI(fRef, fText, bRef, bTrans, bWbw, prog) {
+            document.getElementById("frontRef").innerText = fRef;
+            document.getElementById("frontText").innerText = fText;
+            document.getElementById("backRef").innerText = bRef;
+            document.getElementById("backTranslation").innerText = bTrans;
+            document.getElementById("backWbw").innerText = bWbw;
+            document.getElementById("progress").innerText = prog;
+        }
+
+        function toggleFlip() {
+            isFlipped = !isFlipped;
+            document.getElementById("flashcard").classList.toggle("flipped", isFlipped);
+        }
+
+        function resetFlip() {
+            isFlipped = false;
+            document.getElementById("flashcard").classList.remove("flipped");
+        }
+
+        function nextCard() {
+            if (currentList.length === 0) return;
+            resetFlip();
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % currentList.length;
+                renderCard();
+            }, 150);
+        }
+
+        function prevCard() {
+            if (currentList.length === 0) return;
+            resetFlip();
+            setTimeout(() => {
+                currentIndex = (currentIndex - 1 + currentList.length) % currentList.length;
+                renderCard();
+            }, 150);
+        }
+
+        function shuffleCards() {
+            if (currentList.length === 0) return;
+            resetFlip();
+            setTimeout(() => {
+                for (let i = currentList.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [currentList[i], currentList[j]] = [currentList[j], currentList[i]];
+                }
+                currentIndex = 0;
+                renderCard();
+            }, 150);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') { e.preventDefault(); toggleFlip(); }
+            if (e.code === 'ArrowRight') nextCard();
+            if (e.code === 'ArrowLeft') prevCard();
+        });
+
+        // Valódi, külső Service Worker regisztrációja
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker sikeresen regisztrálva!'))
+                .catch(err => console.log('SW regisztrációs hiba: ', err));
+            });
+        }
+
+        renderCard();
+    </script>
+</body>
+</html>
