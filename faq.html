@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sloka - Gyakran Ismételt Kérdések (Gyakori Kérdések)</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --accent-color: #4f46e5;
+            --accent-hover: #4338ca;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .faq-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Lenyíló (Accordion) stílusok natív HTML details elemmel */
+        details {
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        details:last-child {
+            border-bottom: none;
+        }
+
+        details:hover {
+            background-color: #f1f5f9;
+        }
+
+        summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            list-style: none; /* Alapértelmezett nyíl eltávolítása Chrome/Firefox */
+            user-select: none;
+        }
+
+        /* Egyedi nyíl ikon készítése */
+        summary::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid #64748b;
+            border-bottom: 2px solid #64748b;
+            transform: rotate(45deg);
+            transition: transform 0.2s ease;
+            margin-left: 15px;
+        }
+
+        /* Ha nyitva van a menüpont */
+        details[open] summary::after {
+            transform: rotate(-135deg);
+        }
+
+        /* Eltávolítja a Safari alapértelmezett nyilát */
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .content {
+            padding: 0 24px 24px 24px;
+            color: #475569;
+            font-size: 1rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Szép listák a tartalomhoz */
+        ol, ul {
+            margin-top: 10px;
+            margin-left: 20px;
+            padding-left: 5px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: var(--text-color);
+        }
+
+        .btn-link {
+            display: inline-block;
+            margin-top: 25px;
+            text-align: center;
+            width: 100%;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .btn-link:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+        /* Egyszerű animáció a lenyíláshoz */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 12px;
+            }
+            summary {
+                padding: 16px;
+                font-size: 1rem;
+            }
+            .content {
+                padding: 0 16px 16px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Sloka Alkalmazás – GYIK</h1>
+        <p>Minden, amit a működésről és a telepítésről tudni érdemes</p>
+    </header>
+
+    <div class="faq-container">
+
+        <details>
+            <summary>Hogyan működik a Sloka alkalmazás?</summary>
+            <div class="content">
+                <p>A <strong>Sloka</strong> egy letisztult, modern webes szoftver, amely segít a szent szövegek, versek (slókák) olvasásában, tanulásában és rendszerezésében. Az oldal a GitHub Pages rendszerén fut, így teljesen szervermentes, gyors és biztonságos.</p>
+                <ul>
+                    <li><strong>Interaktív felület:</strong> Lehetővé teszi a versek közötti gyors navigációt és a különböző fordítások/értelmezések megtekintését.</li>
+                    <li><strong>Offline működés:</strong> A modern technológiának köszönhetően az egyszer már betöltött tartalmak internetkapcsolat nélkül is elérhetőek maradnak.</li>
+                    <li><strong>Adatvédelem:</strong> Nem gyűjt személyes adatokat, a beállításaid közvetlenül a böngésződben mentődnek el.</li>
+                </ul>
+            </div>
+        </details>
+
+        <details>
+            <summary>Hogyan telepíthetem Android készülékre? (PWA)</summary>
+            <div class="content">
+                <p>Mivel a Sloka egy <strong>PWA (Progressive Web App)</strong>, nincs szükség a Google Play Áruház használatára. Közvetlenül a böngészőből telepítheted asztali alkalmazásként az alábbi lépésekkel:</p>
+                <ol>
+                    <li>Nyisd meg a <strong>Google Chrome</strong> (vagy más támogatott) böngészőt az Android telefonodon, és látogass el a <a href="https://sanatkoda.github.io/sloka/" target="_blank" style="color: var(--accent-color);">sanatkoda.github.io/sloka/</a> oldalra.</li>
+                    <li>Várd meg, amíg az oldal teljesen betöltődik. Sok esetben az oldal alján automatikusan megjelenik egy <strong>"Alkalmazás hozzáadása a kezdőképernyőhöz"</strong> felugró sáv.</li>
+                    <li>Ha ez nem jelenne meg, koppints a jobb felső sarokban található <strong>három pont (Menü)</strong> ikonra.</li>
+                    <li>Válaszd ki az <strong>"Alkalmazás telepítése"</strong> vagy a <strong>"Hozzáadás a kezdőképernyőhöz"</strong> lehetőséget.</li>
+                    <li>Erősítsd meg a telepítést. Ezt követően a Sloka ikonja megjelenik a telefonod kezdőképernyőjén és az alkalmazásmenüben is, és pontosan úgy fog működni, mint egy natív applikáció.</li>
+                </ol>
+            </div>
+        </details>
+
+        <details>
+            <summary>Hogyan telepíthetem iPhone-ra / iOS-re? (PWA)</summary>
+            <div class="content">
+                <p>Az Apple készülékeken (iOS) az alkalmazások háttértára és a telepítési folyamat kissé eltér, de a folyamat rendkívül gyors:</p>
+                <ol>
+                    <li>Nyisd meg a <strong>Safari</strong> böngészőt az iPhone-odon (fontos, hogy a Safarit használd, mert az iOS csak ezen keresztül engedi a PWA telepítést).</li>
+                    <li>Keresd fel a <a href="https://sanatkoda.github.io/sloka/" target="_blank" style="color: var(--accent-color);">sanatkoda.github.io/sloka/</a> weboldalt.</li>
+                    <li>Koppints a képernyő alján (iPad esetén a felső sávban) található <strong>Megosztás gombra</strong> (egy felfelé mutató nyíl egy négyzetből).</li>
+                    <li>Görgess le a felugró menüben, és válaszd a <strong>"Hozzáadás a főképernyőhöz"</strong> lehetőséget.</li>
+                    <li>Szükség esetén nevezd át a parancsikont, majd nyomj a jobb felső sarokban lévő <strong>"Hozzáadás"</strong> gombra.</li>
+                    <li>A Sloka ikonja azonnal felkerül a főképernyődre. Ha onnan indítod el, eltűnnek a böngészőre jellemző keretek (címsor, navigációs gombok), és teljes képernyős app-élményt kapsz.</li>
+                </ol>
+            </div>
+        </details>
+
+    </div>
+
+    <a href="https://sanatkoda.github.io/sloka/" class="btn-link">Vissza a Sloka főoldalára &rarr;</a>
+</div>
+
+</body>
+</html>
